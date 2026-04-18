@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { ChevronUp, ChevronDown, Download } from "lucide-react";
 import TopBar from "@/components/layout/TopBar";
 import { RetailerRecord } from "@/lib/google-sheets";
-import { BAND_COLORS } from "@/lib/constants";
+import { BAND_COLORS, API_BASE_URL } from "@/lib/constants";
 import RetailerInsightsDrawer from "@/components/RetailerInsightsDrawer";
 import { useRouter } from "next/navigation";
 
@@ -86,9 +86,9 @@ export default function RetailersPage() {
   //     setLoading(true);
   //     try {
   //       // const res  = await fetch("/api/sheets");
-  //       //const res = await fetch("https://localhost:7025/api/Retailer");
+  //       //const res = await fetch(`${API_BASE_URL}/Retailer`);
   //       const res = await fetch(
-  //       `https://localhost:7025/api/Retailer/search?query=${encodeURIComponent(search)}`
+  //       `${API_BASE_URL}/Retailer/search?query=${encodeURIComponent(search)}`
   //     );
   //       const json: RetailerApi[] = await res.json();
 
@@ -118,7 +118,7 @@ export default function RetailersPage() {
     setLoading(true);
     try {
       const res = await fetch(
-        `https://localhost:7025/api/Retailer/search?search=${search}`
+      `${API_BASE_URL}/Retailer/search?search=${search}`
       );
       console.log("API response status:", search);
       const json: RetailerApi[] = await res.json();

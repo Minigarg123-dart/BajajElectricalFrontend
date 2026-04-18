@@ -14,6 +14,7 @@ import {
   STORE_SIZE, BRAND_PRESENCE, CATEGORY_DEPTH, CATCHMENT_POWER,
   FMR_DIMENSIONS,
 } from "@/lib/lookup-tables";
+import { API_BASE_URL } from "@/lib/constants";
 import { useSearchParams } from "next/navigation";
 
 const STEPS = ["Retailer Info", "Environment", "FMR Scoring"];
@@ -63,7 +64,7 @@ const id = idParam ? parseInt(idParam) : 0;
 
 useEffect(() => {
   if (id) {
-    fetch(`https://localhost:7025/api/Retailer/${id}`)
+    fetch(`${API_BASE_URL}/Retailer/${id}`)
       .then(res => res.json())
       .then(data => {
         setForm(prev => ({
@@ -181,7 +182,7 @@ useEffect(() => {
       fmrData: form
     };
     console.log("PAYLOAD:", payload);
-     const res = await fetch("https://localhost:7025/api/Retailer/save", {
+     const res = await fetch(`${API_BASE_URL}/Retailer/save`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)

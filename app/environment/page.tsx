@@ -9,6 +9,7 @@ import TopBar from "@/components/layout/TopBar";
 import KpiCard from "@/components/dashboard/KpiCard";
 import { RetailerRecord } from "@/lib/google-sheets";
 import { computeEnvDimensionScores } from "@/lib/scoring-engine";
+import { API_BASE_URL } from "@/lib/constants";
 
 // ── Constants ───────────────────────────────────────────────────────────────
 
@@ -117,7 +118,7 @@ export default function EnvironmentPage() {
   const fetchData = useCallback(async () => {
     setLoading(true); setError("");
     try {
-       const res = await fetch(`https://localhost:7025/api/Retailer`);
+       const res = await fetch(`${API_BASE_URL}/Retailer`);
       const json = await res.json();
       
       const items = Array.isArray(json) ? json : (json.data || []);

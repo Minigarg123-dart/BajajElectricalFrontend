@@ -61,3 +61,5 @@ export const UPGRADE_ORDER = [
   "Do Not Pursue","Watchlist","Conditional",
   "Selective Target","Active Target","Strategic","Strategic+",
 ];
+
+export const API_BASE_URL = "https://fervent-lewin.103-110-127-229.plesk.page/api";

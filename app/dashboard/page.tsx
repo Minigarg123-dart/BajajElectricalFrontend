@@ -10,18 +10,18 @@ import CityBar from "@/components/dashboard/CityBar";
 import ZoneChart from "@/components/dashboard/ZoneChart";
 import TopBar from "@/components/layout/TopBar";
 import { RetailerRecord } from "@/lib/google-sheets";
-import { BAND_COLORS } from "@/lib/constants";
+import { BAND_COLORS, API_BASE_URL } from "@/lib/constants";
 
 const ZONES = ["East", "West", "North", "South"];
 const BANDS = ["S1", "S2", "A1", "A2", "B1", "B2", "C"];
 const SCORE_RANGES = [
-  { label: "0–20%",   min: 0,    max: 0.20 },
-  { label: "20–40%",  min: 0.20, max: 0.40 },
-  { label: "40–52%",  min: 0.40, max: 0.52 },
-  { label: "52–60%",  min: 0.52, max: 0.60 },
-  { label: "60–68%",  min: 0.60, max: 0.68 },
-  { label: "68–75%",  min: 0.68, max: 0.75 },
-  { label: "75–85%",  min: 0.75, max: 0.85 },
+  { label: "0–20%", min: 0, max: 0.20 },
+  { label: "20–40%", min: 0.20, max: 0.40 },
+  { label: "40–52%", min: 0.40, max: 0.52 },
+  { label: "52–60%", min: 0.52, max: 0.60 },
+  { label: "60–68%", min: 0.60, max: 0.68 },
+  { label: "68–75%", min: 0.68, max: 0.75 },
+  { label: "75–85%", min: 0.75, max: 0.85 },
   { label: "85–100%", min: 0.85, max: 1.01 },
 ];
 
@@ -46,26 +46,27 @@ function SelectPill({ value, onChange, children }: SelectPillProps) {
 }
 
 export default function DashboardPage() {
-  const [data, setData]       = useState<RetailerRecord[]>([]);
+  const [data, setData] = useState<RetailerRecord[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState("");
-  const [search, setSearch]   = useState("");
+  const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
 
-  const [filterZone,     setFilterZone]     = useState("");
-  const [filterBand,     setFilterBand]     = useState("");
+  const [filterZone, setFilterZone] = useState("");
+  const [filterBand, setFilterBand] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
 
   const fetchData = useCallback(async () => {
     setLoading(true); setError("");
     try {
-      const res = await fetch(`https://localhost:7025/api/Retailer`);
+      //const res = await fetch(`https://localhost:7025/api/Retailer`);
+      const res = await fetch(`${API_BASE_URL}/Retailer`);
       const json = await res.json();
-      
+
       const items = Array.isArray(json) ? json : (json.data || []);
       const mapped = items.map((item: any) => {
         let pct = (item.fmrScore ?? 0);
         if (pct > 1) pct = pct / 100;
-        
+
         return {
           id: item.id,
           retailer_name: item.retailerName,
@@ -105,8 +106,8 @@ export default function DashboardPage() {
   const allCategories = [...new Set(data.map(r => r.fmr_final_category).filter(Boolean))].sort();
 
   const filtered = data.filter(r => {
-    if (filterZone     && r.zone               !== filterZone)     return false;
-    if (filterBand     && r.fmr_score_band     !== filterBand)     return false;
+    if (filterZone && r.zone !== filterZone) return false;
+    if (filterBand && r.fmr_score_band !== filterBand) return false;
     if (filterCategory && r.fmr_final_category !== filterCategory) return false;
     if (search) {
       const q = search.toLowerCase();
@@ -116,7 +117,7 @@ export default function DashboardPage() {
   });
 
   // KPIs
-  const total    = filtered.length;
+  const total = filtered.length;
   const avgScore = filtered.length
     ? filtered.reduce((s, r) => s + (parseFloat(r.fmr_final_pct) || 0), 0) / filtered.length
     : 0;
@@ -150,7 +151,7 @@ export default function DashboardPage() {
     .map(([city, count]) => ({ city, count }));
 
   const zoneData = ZONES.map(zone => {
-    const zr  = filtered.filter(r => r.zone === zone);
+    const zr = filtered.filter(r => r.zone === zone);
     const avg = zr.length
       ? zr.reduce((s, r) => s + (parseFloat(r.fmr_final_pct) || 0), 0) / zr.length
       : 0;
@@ -219,11 +220,11 @@ export default function DashboardPage() {
           <>
             {/* ── Row 1: KPI Cards ── */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-              <KpiCard title="Total Retailers"  value={total}                             accent="#0052A3" />
-              <KpiCard title="Avg Score"        value={`${(avgScore * 100).toFixed(1)}%`} accent="#2A7ADE" />
-              <KpiCard title="Top City"         value={cityFreq[topCity] ?? 0}            accent="#22C55E" sub={topCity} />
-              <KpiCard title="Total Cities"     value={cityCount}                         accent="#F59E0B" />
-              <KpiCard title="Top Band"         value={topBand}                           accent={BAND_COLORS[topBand] ?? "#aaa"} />
+              <KpiCard title="Total Retailers" value={total} accent="#0052A3" />
+              <KpiCard title="Avg Score" value={`${(avgScore * 100).toFixed(1)}%`} accent="#2A7ADE" />
+              <KpiCard title="Top City" value={cityFreq[topCity] ?? 0} accent="#22C55E" sub={topCity} />
+              <KpiCard title="Total Cities" value={cityCount} accent="#F59E0B" />
+              <KpiCard title="Top Band" value={topBand} accent={BAND_COLORS[topBand] ?? "#aaa"} />
             </div>
 
             {/* ── Row 2: Score Distribution — full width ── */}
@@ -235,7 +236,7 @@ export default function DashboardPage() {
             {/* ── Row 4: Band donut + City bar + Zone chart ── */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               <BandDonut data={bandData} />
-              <CityBar   data={cityBarData} />
+              <CityBar data={cityBarData} />
               <ZoneChart data={zoneData} />
             </div>
           </>
